@@ -1,46 +1,14 @@
-var express = require('express');
-var app = express();
-var cool = require('cool-ascii-faces');
-var mongoose = require('mongoose');
+require('babel-core/register')({});
+require('babel-polyfill');
 
-var mongodbUri = process.env.MONGODB_URI;
-app.set('port', (process.env.PORT || 5000));
+// The real entry point
+var server = require('./server.jsx').default;
 
-app.use(express.static(__dirname + '/public'));
+// Use provided port or 3000 as default
+var PORT = process.env.PORT || 3000;
 
-// views is directory for all template files
-app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs');
-
-app.get('/', function(request, response) {
-  response.render('pages/index');
+// Run the server at the specified port
+server.listen(PORT, function() {
+	console.log('Server listening on: ' + PORT);
 });
-
-app.get('/cool', function(request, response) {
-  response.send(cool());
-});
-
-app.get('/times', function(request, response) {
-  var result = '';
-  times = process.env.TIMES || 5;
-  for (var i = 0; i < times; i++) {
-    result += i + ' ';
-  }
-
-  response.send(result);
-});
-
-app.get('/db', function (request, response) {
-  console.log(process.env);
-  mongoose.connect(mongodbUri);
-  var dbConnection = mongoose.connection;
-  dbConnection.once('open', function() {
-    response.send('It works');
-  });
-})
-
-app.listen(app.get('port'), function() {
-  console.log('Node app is running on port', app.get('port'));
-});
-
 
